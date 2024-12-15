@@ -1,0 +1,3 @@
+
+echo Starting Spring Boot application...
+java -jar /Users/masood/default-workspace/trench-calculation-microservice/target/trench-calculation-microservice-0.0.1-SNAPSHOT.jar 

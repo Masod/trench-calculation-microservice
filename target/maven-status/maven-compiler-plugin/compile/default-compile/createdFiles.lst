@@ -1,0 +1,10 @@
+com/tarrar/trench/config/WebConfig.class
+com/tarrar/trench/TrenchCalculationMicroserviceApplication.class
+com/tarrar/trench/controller/CustomErrorController.class
+com/tarrar/trench/util/ExcelGenerator.class
+com/tarrar/trench/service/TrenchService.class
+com/tarrar/trench/config/SecurityConfig.class
+com/tarrar/trench/controller/TrenchController.class
+com/tarrar/trench/config/WebConfig$1.class
+com/tarrar/trench/config/CorsFilter.class
+com/tarrar/trench/controller/ReactFallbackController.class
