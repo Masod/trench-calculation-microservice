@@ -1,62 +1,92 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Grid,
   TextField,
-  Button,
-  Checkbox,
-  Typography,
+  FormControl,
+  InputLabel,
   Select,
   MenuItem,
-  InputLabel,
-  FormControl,
+  Button,
+  Checkbox,
 } from '@mui/material';
 
-const FormInput = ({ onSubmit }) => {
-  const [trenchType, setTrenchType] = useState('Distribution');
-  const [conduits, setConduits] = useState([]);
-
-  const handleAddConduit = () => {
-    setConduits([...conduits, { type: '', sizes: '', count: '', checked: false }]);
-  };
-
-  const handleRemoveConduits = () => {
-    const updatedConduits = conduits.filter((conduit) => !conduit.checked);
-    setConduits(updatedConduits);
-  };
-
-  const handleCheckboxChange = (index) => {
-    const updatedConduits = [...conduits];
-    updatedConduits[index].checked = !updatedConduits[index].checked;
-    setConduits(updatedConduits);
-  };
-
-  const handleInputChange = (index, field, value) => {
-    const updatedConduits = [...conduits];
-    updatedConduits[index][field] = value;
-    setConduits(updatedConduits);
-  };
-
-  const handleSubmit = () => {
-	if ( conduits.length == 0 || conduits[0].sizes === '' ){
-		  return;
-	}
-    onSubmit({ trenchType, conduits });
-  };
-  
-  const reloadPage = () => {
-  	window. location. reload()
-  }
-
+const FormInput = ({
+  sectionName,
+  setSectionName,
+  trenchType,
+  setTrenchType,
+  conduits,
+  handleInputChange,
+  handleCheckboxChange,
+  handleAddConduit,
+  handleRemoveConduits,
+  reloadPage,
+  handleSubmit,
+  handleAddSection,
+  handleRemoveSection,
+  handleNavigateSection,
+  currentSectionIndex,
+  totalSections,
+}) => {
   return (
     <Grid
       container
       spacing={2}
       style={{ padding: '20px', maxWidth: '900px', margin: '0 auto' }}
     >
+      {/* Navigation Buttons */}
+      <Grid item xs={12} style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <Button
+          variant="contained"
+          disabled={currentSectionIndex <= 0}
+          onClick={() => handleNavigateSection('first')}
+        >
+          {'<<'}
+        </Button>
+        <Button
+          variant="contained"
+          disabled={currentSectionIndex <= 0}
+          onClick={() => handleNavigateSection('prev')}
+          style={{ marginLeft: '10px' }}
+        >
+          {'<'}
+        </Button>
+        <span style={{ margin: '0 20px', fontWeight: 'bold' }}>
+          Section {currentSectionIndex + 1} of {totalSections}
+        </span>
+        <Button
+          variant="contained"
+          disabled={currentSectionIndex >= totalSections - 1}
+          onClick={() => handleNavigateSection('next')}
+          style={{ marginRight: '10px' }}
+        >
+          {'>'}
+        </Button>
+        <Button
+          variant="contained"
+          disabled={currentSectionIndex >= totalSections - 1}
+          onClick={() => handleNavigateSection('last')}
+        >
+          {'>>'}
+        </Button>
+      </Grid>
+
+      {/* Editable Section Name */}
+      <Grid item xs={12}>
+        <TextField
+          label="Section Name"
+          value={sectionName}
+          onChange={(e) => setSectionName(e.target.value)}
+          fullWidth
+        />
+      </Grid>
+
       {/* Trench Type Dropdown */}
       <Grid item xs={12}>
         <FormControl fullWidth>
-          <InputLabel style={{backgroundColor: 'white', marginRight: '1px'}} >Trench Type</InputLabel>
+          <InputLabel style={{ backgroundColor: 'white', marginRight: '1px' }}>
+            Trench Type
+          </InputLabel>
           <Select
             value={trenchType}
             onChange={(e) => setTrenchType(e.target.value)}
@@ -68,7 +98,7 @@ const FormInput = ({ onSubmit }) => {
       </Grid>
 
       {/* Conduits Rows */}
-      {conduits.map((conduit, index) => (
+      {(conduits || []).map((conduit, index) => (
         <Grid
           container
           spacing={2}
@@ -78,15 +108,14 @@ const FormInput = ({ onSubmit }) => {
         >
           <Grid item xs={1}>
             <Checkbox
-              checked={conduit.checked}
-			  style={{ marginLeft: '2px' }}
+              checked={conduit.checked || false}
               onChange={() => handleCheckboxChange(index)}
             />
           </Grid>
           <Grid item xs={3}>
             <TextField
               label="Conduit Type"
-              value={conduit.type}
+              value={conduit.type || ''}
               onChange={(e) =>
                 handleInputChange(index, 'type', e.target.value)
               }
@@ -96,8 +125,7 @@ const FormInput = ({ onSubmit }) => {
           <Grid item xs={3}>
             <TextField
               label="Sizes (comma-separated)"
-			  style={{ width: '100%' }}
-              value={conduit.sizes}
+              value={conduit.sizes || ''}
               onChange={(e) =>
                 handleInputChange(index, 'sizes', e.target.value)
               }
@@ -108,8 +136,7 @@ const FormInput = ({ onSubmit }) => {
             <TextField
               label="Count"
               type="number"
-			  style={{ width: '100px' }}
-              value={conduit.count}
+              value={conduit.count || 0}
               onChange={(e) =>
                 handleInputChange(index, 'count', e.target.value)
               }
@@ -118,48 +145,77 @@ const FormInput = ({ onSubmit }) => {
           </Grid>
         </Grid>
       ))}
+	  
+	  {/* Add and Remove Buttons */}
+	       <Grid container spacing={2} style={{ marginTop: '20px', marginLeft: '0.5px'}}>
+	         <Grid item>
+	           <Button
+	             variant="contained"
+	             color="primary"
+	             size="small"
+	             onClick={handleAddConduit}
+	           >
+	             Add Conduit
+	           </Button>
+	         </Grid>
+	         {conduits.length > 0 && (
+	           <Grid item>
+	             <Button
+	               variant="contained"
+	               color="error"
+	               size="small"
+	               onClick={handleRemoveConduits}
+	             >
+	               Remove Conduit
+	             </Button>
+	           </Grid>
+	         )}
+	  	<Grid item>
+	  	        <Button
+	  	          variant="contained"
+	  	          color="primary"
+	  	          size="small"
+	  			  onClick={reloadPage}
+	  	        >
+	  	          Reset
+	  	        </Button>
+	  	</Grid>
+	       </Grid>
 
-      {/* Add and Remove Buttons */}
-      <Grid container spacing={2} style={{ marginTop: '20px', marginLeft: '0.5px'}}>
-        <Grid item>
+
+      {/* Add and Remove Section Buttons */}
+      <Grid container spacing={2} style={{ marginTop: '20px', marginLeft: '2px'}}>
+        <Grid item xs={6}>
           <Button
             variant="contained"
-            color="primary"
-            size="small"
-            onClick={handleAddConduit}
+            color="success"
+            fullWidth
+            onClick={handleAddSection}
           >
-            Add
+            Add Section
           </Button>
         </Grid>
-        {conduits.length > 0 && (
-          <Grid item>
-            <Button
-              variant="contained"
-              color="secondary"
-              size="small"
-              onClick={handleRemoveConduits}
-            >
-              Remove
-            </Button>
-          </Grid>
-        )}
-		<Grid item>
-		        <Button
-		          variant="contained"
-		          color="primary"
-		          size="small"
-				  onClick={reloadPage}
-		        >
-		          Reset
-		        </Button>
-		</Grid>
+        <Grid item xs={6}>
+          <Button
+            variant="contained"
+            color="error"
+            fullWidth
+            onClick={handleRemoveSection}
+            disabled={totalSections <= 1} // Disable if only one section remains
+          >
+            Remove Section
+          </Button>
+        </Grid>
       </Grid>
 
       {/* Calculate Button */}
-      <Grid item xs={12} style={{ marginTop: '20px', marginLeft: '0.5px' }}>
+      <Grid item xs={12} style={{marginTop: '20px', marginLeft: '0.5px' }}>
         <Button
           variant="contained"
-          color="secondary"
+		  style={{
+		        backgroundColor: 'black', // Set background color to black
+		        color: 'white',          // Ensure the text is readable
+		      }}
           fullWidth
           onClick={handleSubmit}
         >
